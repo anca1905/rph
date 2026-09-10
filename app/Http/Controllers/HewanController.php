@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Hewan;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\HewanImport;
 
 class HewanController extends Controller
 {
@@ -94,5 +96,19 @@ class HewanController extends Controller
         $hewan->delete();
 
         return redirect()->back()->with('success', 'Data hewan berhasil dihapus!');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        try {
+            Excel::import(new HewanImport, $request->file('file_import'));
+            return redirect()->back()->with('success', 'Data Hewan Harian berhasil diimport.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
+        }
     }
 }

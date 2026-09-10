@@ -12,15 +12,55 @@ use Carbon\Carbon;
 
 class PemotonganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $periode = $request->input('periode', 'harian');
+        
+        $queryDipotong = Pemotongan::where('status_pemotongan', 'Selesai Dipotong');
+        $queryLolos = Antemortem::where('status_antemortem', 'Lolos');
+        $queryKarantina = Antemortem::where('status_antemortem', 'Karantina');
+
+        $teksPeriode = 'Hari Ini';
+        $today = Carbon::today();
+
+        if ($periode == 'harian') {
+            $teksPeriode = 'Hari Ini';
+            $queryDipotong->whereDate('waktu_potong', $today);
+            $queryLolos->whereDate('tanggal_periksa', $today);
+            $queryKarantina->whereDate('tanggal_periksa', $today);
+        } elseif ($periode == 'bulanan') {
+            $teksPeriode = 'Bulan Ini';
+            $queryDipotong->whereMonth('waktu_potong', $today->month)->whereYear('waktu_potong', $today->year);
+            $queryLolos->whereMonth('tanggal_periksa', $today->month)->whereYear('tanggal_periksa', $today->year);
+            $queryKarantina->whereMonth('tanggal_periksa', $today->month)->whereYear('tanggal_periksa', $today->year);
+        } elseif ($periode == 'tahunan') {
+            $teksPeriode = 'Tahun Ini';
+            $queryDipotong->whereYear('waktu_potong', $today->year);
+            $queryLolos->whereYear('tanggal_periksa', $today->year);
+            $queryKarantina->whereYear('tanggal_periksa', $today->year);
+        } else {
+            $teksPeriode = 'Semua Waktu';
+        }
+
+        $jumlahDipotong = $queryDipotong->count();
+        $jumlahLolos = $queryLolos->count();
+        $jumlahKarantina = $queryKarantina->count();
+
         // Ambil SEMUA data hewan harian beserta relasi pemotongannya
+        // Jika butuh filter tabel, bisa ditambah di sini. Untuk sekarang ikuti yang ada:
         $hewans = Hewan::where('kategori', 'Hewan Harian')
                        ->with(['pemotongan', 'pembayaran', 'antemortem'])
                        ->latest()
                        ->get();
         
-        return view('pemotongan.index', compact('hewans'));
+        return view('pemotongan.index', compact(
+            'hewans', 
+            'periode', 
+            'teksPeriode', 
+            'jumlahDipotong', 
+            'jumlahLolos', 
+            'jumlahKarantina'
+        ));
     }
 
     public function store(Request $request)

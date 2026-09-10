@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PemotonganIdulAdha;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PemotonganIdulAdhaImport;
 
 class IdulAdhaController extends Controller
 {
@@ -64,6 +66,20 @@ class IdulAdhaController extends Controller
         $data->delete();
 
         return redirect()->back()->with('success', 'Data Pemotongan Idul Adha berhasil dihapus.');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_import' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        try {
+            Excel::import(new PemotonganIdulAdhaImport, $request->file('file_import'));
+            return redirect()->back()->with('success', 'Data berhasil diimport.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
+        }
     }
 
     public function exportPdf(Request $request)

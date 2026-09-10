@@ -19,6 +19,20 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div id="alert-session-error"
+            class="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl flex items-center justify-between shadow-sm transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-exclamation-circle text-lg"></i>
+                <span class="font-medium text-sm">{{ session('error') }}</span>
+            </div>
+            <button type="button" onclick="document.getElementById('alert-session-error').remove()"
+                class="text-red-400 hover:text-red-600 transition-colors focus:outline-none" title="Tutup">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div id="alert-error"
             class="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl shadow-sm flex justify-between items-start transition-all duration-300">
@@ -51,6 +65,10 @@
                     <button onclick="toggleModal('modalTambah')"
                         class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md shadow-emerald-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
                         <i class="fas fa-plus-circle"></i> Input Laporan
+                    </button>
+                    <button onclick="toggleModal('modalImport')"
+                        class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
+                        <i class="fas fa-file-import"></i> Import Excel
                     </button>
                 @endif
                 <button onclick="exportExcelIdulAdha()"
@@ -237,6 +255,38 @@
                         <button type="submit"
                             class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl hover:from-emerald-600 hover:to-teal-600 shadow-md shadow-emerald-500/30 transform hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"><i class="fas fa-save mr-1.5"></i> Simpan
                             Laporan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT -->
+    <div id="modalImport" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onclick="toggleModal('modalImport')"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative bg-white rounded-2xl text-left shadow-2xl transform transition-all sm:my-8 sm:max-w-lg w-full flex flex-col border border-slate-100">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center shrink-0 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-file-import mr-2 opacity-80"></i>
+                        Import Data dari Excel</h3>
+                    <button type="button" onclick="toggleModal('modalImport')" class="text-blue-100 hover:text-white transition-colors focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <form action="{{ route('idul_adha.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col">
+                    @csrf
+                    <div class="px-6 py-5 bg-slate-50/50">
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Upload File Excel (.xls, .xlsx, .csv)</label>
+                            <input type="file" name="file_import" required accept=".xls,.xlsx,.csv"
+                                class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            <p class="text-xs text-slate-500 mt-2">Pastikan format kolom sesuai dengan data yang ada di tabel, urutan kolom: Tanggal, Nama Lokasi, Jenis Lokasi, Jenis Lokasi Lainnya, Alamat, Propinsi, Kabupaten, Kecamatan, Desa, Jenis Hewan, Jumlah, UPT, Pelapor.</p>
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 bg-white border-t border-slate-100 flex justify-end gap-3 rounded-b-2xl">
+                        <button type="button" onclick="toggleModal('modalImport')"
+                            class="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">Batal</button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl hover:from-blue-600 hover:to-indigo-600 shadow-md shadow-blue-500/30 transform hover:-translate-y-0.5 transition-all"><i class="fas fa-upload mr-1.5"></i> Proses Import</button>
                     </div>
                 </form>
             </div>

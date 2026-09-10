@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:petugas,admin,pekerja_idul_adha'])->group(function () {
         // Rute Pemotongan Idul Adha (Standalone)
         Route::post('/idul_adha', [IdulAdhaController::class, 'store'])->name('idul_adha.store');
+        Route::post('/idul_adha/import', [IdulAdhaController::class, 'import'])->name('idul_adha.import');
         Route::put('/idul_adha/update/{id}', [IdulAdhaController::class, 'update'])->name('idul_adha.update');
         Route::delete('/idul_adha/delete/{id}', [IdulAdhaController::class, 'destroy'])->name('idul_adha.destroy');
     });
@@ -76,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Data Hewan
         Route::post('/hewan/store', [HewanController::class, 'store'])->name('hewan.store');
+        Route::post('/hewan/import', [HewanController::class, 'import'])->name('hewan.import');
         Route::put('/hewan/update/{id}', [HewanController::class, 'update'])->name('hewan.update');
         Route::delete('/hewan/destroy/{id}', [HewanController::class, 'destroy'])->name('hewan.destroy');
 
