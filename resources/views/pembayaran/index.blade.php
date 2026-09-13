@@ -213,11 +213,11 @@
                                             </button>
                                             @if(auth()->user()->role != 'pimpinan')
 
-                                            <button onclick="editData(this)" data-bayar="{{ json_encode($bayar) }}"
+                                            {{-- <button onclick="editData(this)" data-bayar="{{ json_encode($bayar) }}"
                                                 class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
                                                 title="Edit Transaksi">
                                                 <i class="fas fa-pen text-xs"></i>
-                                            </button>
+                                            </button> --}}
                                             <button
                                                 onclick="konfirmasiHapus('{{ route('pembayaran.destroy', $bayar->id_pembayaran) }}')"
                                                 class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"

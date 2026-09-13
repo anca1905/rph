@@ -83,13 +83,13 @@
                 </button>
             </form>
 
-            <div class="mt-6 pt-5 border-t border-slate-100 text-center">
+            {{-- <div class="mt-6 pt-5 border-t border-slate-100 text-center">
                 <p class="text-xs text-slate-600 font-medium">Belum punya akun petugas?</p>
                 <a href="{{ route('register') }}"
                     class="inline-block mt-1.5 text-sm text-emerald-600 font-bold hover:text-emerald-700 transition-colors underline underline-offset-4 decoration-2 decoration-emerald-600/30 hover:decoration-emerald-600">
                     Daftar Sekarang
                 </a>
-            </div>
+            </div> --}}
 
         </div>
 
