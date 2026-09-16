@@ -432,7 +432,7 @@
 
                 let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
                     "&format=" + tipe;
-                window.open(url, '_blank');
+                window.location.href = url;
             }
         }
     </script>

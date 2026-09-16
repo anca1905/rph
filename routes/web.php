@@ -13,6 +13,7 @@ use App\Http\Controllers\PemotonganController;
 use App\Http\Controllers\PostmortemController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PekerjaIdulAdhaController;
+use App\Http\Controllers\UserController;
 
 // ================= ROUTE AUTENTIKASI =================
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -57,6 +58,10 @@ Route::middleware(['auth'])->group(function () {
 
     // --> KHUSUS ADMIN (Kelola Pekerja)
     Route::middleware(['role:admin'])->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::get('/pekerja', [PekerjaIdulAdhaController::class, 'index'])->name('pekerja.index');
         Route::post('/pekerja/store', [PekerjaIdulAdhaController::class, 'store'])->name('pekerja.store');
         Route::put('/pekerja/update/{id}', [PekerjaIdulAdhaController::class, 'update'])->name('pekerja.update');

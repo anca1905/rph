@@ -208,6 +208,12 @@
                         <p class="text-[10px] font-bold text-emerald-300/70 uppercase tracking-widest mb-1.5 px-3">
                             Manajemen</p>
 
+                        <a href="{{ url('/users') }}"
+                            class="group flex items-center px-3 py-2 rounded-xl transition-all duration-300 {{ Request::is('users') ? 'bg-white text-emerald-800 shadow-md font-bold translate-x-1' : 'text-emerald-100 hover:bg-white/10 hover:text-white font-medium' }}">
+                            <i class="fas fa-user-shield w-5 text-center {{ Request::is('users') ? 'text-green-500' : 'text-emerald-400 group-hover:text-green-300' }} transition-colors"></i>
+                            <span class="mx-3 text-sm">Kelola Akun</span>
+                        </a>
+
                         <a href="{{ url('/pekerja') }}"
                             class="group flex items-center px-3 py-2 rounded-xl transition-all duration-300 {{ Request::is('pekerja') ? 'bg-white text-emerald-800 shadow-md font-bold translate-x-1' : 'text-emerald-100 hover:bg-white/10 hover:text-white font-medium' }}">
                             <i
