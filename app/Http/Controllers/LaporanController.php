@@ -166,7 +166,7 @@ class LaporanController extends Controller
         ];
 
         if ($format == 'pdf') {
-            $pdf = Pdf::loadView('laporan.cetak', $data)->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', $orientasiCetak);
+            $pdf = Pdf::loadView('laporan.cetak', $data)->setOptions(['isRemoteEnabled' => true])->setPaper('A4', $orientasiCetak);
             return $pdf->download('Laporan_RPH_'.$jenis_laporan.'.pdf');
         }
 

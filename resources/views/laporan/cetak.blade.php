@@ -210,12 +210,15 @@
             // 1. Konversi gambar Logo ke Base64
             $imagePath = public_path('Lambang_Kab_Kolaka.jpg');
             if (!file_exists($imagePath)) {
+                $imagePath = public_path('Lambang_Kab_Kolaka.png');
+            }
+            if (!file_exists($imagePath)) {
                 $imagePath = public_path('Lambang_Kab_Kolaka.PNG');
             }
 
             $base64 = '';
             if (file_exists($imagePath)) {
-                $type = pathinfo($imagePath, PATHINFO_EXTENSION);
+                $type = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
                 $dataImage = file_get_contents($imagePath);
                 $base64 = 'data:image/' . $type . ';base64,' . base64_encode($dataImage);
             }
