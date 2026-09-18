@@ -91,7 +91,7 @@ class IdulAdhaController extends Controller
 
         $qrText = "Naskah ini telah tertandatangan oleh:\n";
         $qrText .= "Nama: " . $namaTtd . "\n";
-        $qrText .= "Jabatan: Kepala Dinas Perkebunan dan Peternakan\n";
+        $qrText .= "Jabatan: Kepala Bidang Peternakan dan Kesehatan Hewan\n";
         $qrText .= "Unit Kerja: Dinas Perkebunan dan Peternakan\n";
         $qrText .= "Instansi: Pemerintah Kabupaten Kolaka\n";
         $qrText .= "Ditandatangani pada: " . \Carbon\Carbon::now()->translatedFormat('d F Y H:i:s');
@@ -106,12 +106,15 @@ class IdulAdhaController extends Controller
             'nama_ttd'       => $namaTtd,
             'nip_ttd'        => $nipTtd,
             'pangkat_ttd'    => $pangkatTtd,
+            'jabatan_ttd'    => 'Kepala Bidang Peternakan dan Kesehatan Hewan',
             'orientasi'      => $orientasiCetak,
             'gambar_ttd'     => session('gambar_ttd'),
             'gambar_stempel' => session('gambar_stempel'),
             'qrCode'         => 'data:image/svg+xml;base64,' . $qrCode,
         ];
 
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '2048M');
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('idul_adha.cetak_pdf', $data)->setPaper('A4', $orientasiCetak);
         return $pdf->download('Laporan_Pemotongan_Idul_Adha.pdf');
     }

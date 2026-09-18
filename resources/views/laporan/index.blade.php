@@ -76,6 +76,10 @@
                         class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 text-sm font-bold rounded-xl hover:bg-red-100 transition-colors shadow-sm flex items-center gap-2">
                         <i class="fas fa-file-pdf"></i> Unduh PDF
                     </button>
+                    <button onclick="exportLaporan('word')"
+                        class="px-4 py-2 bg-blue-50 text-blue-600 border border-blue-200 text-sm font-bold rounded-xl hover:bg-blue-100 transition-colors shadow-sm flex items-center gap-2">
+                        <i class="fas fa-file-word"></i> Unduh Word
+                    </button>
                 </div>
 
                 <div>
@@ -266,29 +270,37 @@
                 <i class="fas fa-times text-xl"></i>
             </button>
 
+            @php
+                $isDokter = isset($jenis_laporan) && in_array($jenis_laporan, ['antemortem', 'postmortem']);
+                $labelNama = $isDokter ? 'Nama Dokter Hewan' : 'Nama Kepala Bidang';
+                $labelNIP = $isDokter ? 'NIP Dokter Hewan' : 'NIP Kepala Bidang';
+                $labelPangkat = $isDokter ? 'Jabatan' : 'Pangkat dan Golongan';
+                $descModal = $isDokter ? 'Atur Nama dan NIP Dokter Hewan yang akan disematkan ke dalam pengesahan dokumen cetak.' : 'Atur Nama dan NIP Kepala Bidang yang akan disematkan ke dalam pengesahan dokumen cetak.';
+            @endphp
+
             <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fas fa-pen-nib text-green-600 mr-2"></i>
                 Pengaturan Format Cetak</h3>
-            <p class="text-xs text-slate-500 mb-5">Atur Nama dan NIP Kepala Dinas yang akan disematkan ke dalam QR Code pengesahan dokumen cetak PDF.</p>
+            <p class="text-xs text-slate-500 mb-5">{{ $descModal }}</p>
 
             <form action="{{ route('laporan.simpan_ttd') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kepala Dinas</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ $labelNama }}</label>
                         <input type="text" name="nama_ttd" value="{{ session('nama_ttd', '') }}"
-                            placeholder="Contoh: Drh. Ahmad Fauzi"
+                            placeholder="Contoh: drh. Ahmad Fauzi"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-green-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">NIP Kepala Dinas</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ $labelNIP }}</label>
                         <input type="text" name="nip_ttd" value="{{ session('nip_ttd', '') }}"
                             placeholder="Contoh: 19800101 200501 1 001"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-green-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pangkat dan Golongan</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ $labelPangkat }}</label>
                         <input type="text" name="pangkat_ttd" value="{{ session('pangkat_ttd', '') }}"
-                            placeholder="Contoh: Pembina Utama Muda, Gol. IV/c"
+                            placeholder="{{ $isDokter ? 'Contoh: Dokter Hewan' : 'Contoh: Pembina Utama Muda, Gol. IV/c' }}"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-green-500">
                     </div>
                     <div>

@@ -135,20 +135,22 @@ class LaporanController extends Controller
             });
         }
 
-        $namaTtd = session('nama_ttd', 'Hasbir Jaya Razak, SP');
-        $nipTtd = session('nip_ttd', '19690914 199803 2 005');
+        $isDokter = in_array($jenis_laporan, ['antemortem', 'postmortem']);
+        $jabatanTtd = $isDokter ? 'Dokter Hewan' : 'Kepala Bidang Peternakan dan Kesehatan Hewan';
+
+        $namaTtd = session('nama_ttd', $isDokter ? 'drh. Nama Dokter' : 'Hasbir Jaya Razak, SP');
+        $nipTtd = session('nip_ttd', $isDokter ? 'NIP Dokter' : '19690914 199803 2 005');
+        $pangkatTtd = session('pangkat_ttd', $isDokter ? 'Dokter Hewan' : 'Pembina Utama Muda, Gol. IV/c');
+        $orientasiCetak = session('orientasi_cetak', 'landscape');
 
         $qrText = "Naskah ini telah tertandatangan oleh:\n";
         $qrText .= "Nama: " . $namaTtd . "\n";
-        $qrText .= "Jabatan: Kepala Dinas Perkebunan dan Peternakan\n";
+        $qrText .= "Jabatan: " . $jabatanTtd . "\n";
         $qrText .= "Unit Kerja: Dinas Perkebunan dan Peternakan\n";
         $qrText .= "Instansi: Pemerintah Kabupaten Kolaka\n";
         $qrText .= "Ditandatangani pada: " . \Carbon\Carbon::now()->translatedFormat('d F Y H:i:s');
         
         $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(1)->size(100)->errorCorrection('H')->generate($qrText));
-
-        $pangkatTtd = session('pangkat_ttd', 'Pembina Utama Muda, Gol. IV/c');
-        $orientasiCetak = session('orientasi_cetak', 'landscape');
 
         $data = [
             'jenis_laporan'  => $jenis_laporan,
@@ -159,6 +161,7 @@ class LaporanController extends Controller
             'nama_ttd'       => $namaTtd,
             'nip_ttd'        => $nipTtd,
             'pangkat_ttd'    => $pangkatTtd,
+            'jabatan_ttd'    => $jabatanTtd,
             'orientasi'      => $orientasiCetak,
             'gambar_ttd'     => session('gambar_ttd'),
             'gambar_stempel' => session('gambar_stempel'),
@@ -166,8 +169,16 @@ class LaporanController extends Controller
         ];
 
         if ($format == 'pdf') {
-            $pdf = Pdf::loadView('laporan.cetak', $data)->setOptions(['isRemoteEnabled' => true])->setPaper('A4', $orientasiCetak);
+            ini_set('max_execution_time', 300);
+            ini_set('memory_limit', '2048M');
+            $pdf = Pdf::loadView('laporan.cetak', $data)->setPaper('A4', $orientasiCetak);
             return $pdf->download('Laporan_RPH_'.$jenis_laporan.'.pdf');
+        } elseif ($format == 'word') {
+            $headers = [
+                "Content-type" => "application/vnd.ms-word",
+                "Content-Disposition" => "attachment;Filename=Laporan_RPH_".$jenis_laporan.".doc"
+            ];
+            return response()->make(view('laporan.cetak', $data), 200, $headers);
         }
 
         return redirect()->back();

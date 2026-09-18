@@ -181,8 +181,8 @@ class AuthController extends Controller
             ['token' => $otp, 'created_at' => Carbon::now()]
         );
 
-        // Kirim Email (Untuk testing, ini akan masuk ke storage/logs/laravel.log jika MAIL_MAILER=log)
-        Mail::raw("Kode OTP Anda untuk mereset password di Sistem RPH Kolaka adalah: $otp\n\nKode ini hanya berlaku selama 15 menit.", function ($message) use ($request) {
+        // Kirim Email dengan template HTML yang cantik
+        Mail::send('emails.otp', ['otp' => $otp], function ($message) use ($request) {
             $message->to($request->email)->subject('Kode OTP Reset Password - RPH Kolaka');
         });
 

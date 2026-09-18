@@ -262,7 +262,7 @@
             <tr>
                 <td width="15%" align="center" valign="middle">
                     @if ($base64 != '')
-                        <img src="{{ $base64 }}" width="90" alt="Logo Kolaka">
+                        <img src="{{ $base64 }}" width="90" height="115" alt="Logo Kolaka">
                     @endif
                 </td>
                 <td width="85%" class="teks-kop" align="center" valign="middle">
@@ -590,22 +590,26 @@
             <tr>
                 <td width="60%"></td>
                 <td width="40%" align="left" style="font-size: 12pt; line-height: 1.2;">
-                    Kepala Dinas Perkebunan dan Peternakan<br>
+                    {{ $jabatan_ttd ?? 'Kepala Bidang Peternakan dan Kesehatan Hewan' }}<br>
                     Kabupaten Kolaka<br>
                     
                     <div style="margin: 5px 0; height: 110px; position: relative; display: block;">
                         @if(isset($qrCode))
-                            <img src="{{ $qrCode }}" alt="QR Code" width="100" style="position: absolute; top: 5px; left: 0; z-index: 1;">
-                            @if(isset($base64) && $base64 != '')
-                                <img src="{{ $base64 }}" width="20" style="position: absolute; top: 45px; left: 40px; background-color: white; z-index: 2; padding: 2px;">
+                            @if(request('format') == 'word')
+                                <img src="{{ $qrCode }}" alt="QR Code" width="100" height="100">
+                            @else
+                                <img src="{{ $qrCode }}" alt="QR Code" width="100" height="100" style="position: absolute; top: 5px; left: 0; z-index: 1;">
+                                @if(isset($base64) && $base64 != '')
+                                    <img src="{{ $base64 }}" width="20" height="25" style="position: absolute; top: 43px; left: 40px; background-color: white; z-index: 2; padding: 2px;">
+                                @endif
                             @endif
                         @else
                             @if ($stempelBase64 != '')
-                                <img src="{{ $stempelBase64 }}" width="95" alt="Stempel"
+                                <img src="{{ $stempelBase64 }}" width="95" height="95" alt="Stempel"
                                     style="position: absolute; top: 0; left: 0; z-index: 1;">
                             @endif
                             @if ($ttdBase64 != '')
-                                <img src="{{ $ttdBase64 }}" width="130" alt="TTD"
+                                <img src="{{ $ttdBase64 }}" width="130" height="80" alt="TTD"
                                     style="position: absolute; top: 5px; left: 40px; z-index: 2;">
                             @endif
                         @endif
