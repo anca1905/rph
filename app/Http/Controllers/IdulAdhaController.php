@@ -86,19 +86,25 @@ class IdulAdhaController extends Controller
     {
         $dataLaporan = PemotonganIdulAdha::orderBy('tanggal', 'desc')->get();
 
-        $namaTtd = session('nama_ttd', 'Hasbir Jaya Razak, SP');
-        $nipTtd = session('nip_ttd', '19690914 199803 2 005');
+        $namaTtd = session('nama_ttd', 'Dr. drh. KASMAWATI, MM');
+        $nipTtd = session('nip_ttd', '19771202 200604 2 005');
 
         $qrText = "Naskah ini telah tertandatangan oleh:\n";
         $qrText .= "Nama: " . $namaTtd . "\n";
-        $qrText .= "Jabatan: Kepala Bidang Peternakan dan Kesehatan Hewan\n";
+        $qrText .= "Jabatan: Kepala Bidang Peternakan\n";
         $qrText .= "Unit Kerja: Dinas Perkebunan dan Peternakan\n";
         $qrText .= "Instansi: Pemerintah Kabupaten Kolaka\n";
         $qrText .= "Ditandatangani pada: " . \Carbon\Carbon::now()->translatedFormat('d F Y H:i:s');
         
-        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(1)->size(100)->errorCorrection('H')->generate($qrText));
+        try {
+            $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->margin(1)->size(400)->errorCorrection('H')->generate($qrText));
+            $qrDataUri = 'data:image/png;base64,' . $qrCode;
+        } catch (\Exception $e) {
+            $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(1)->size(400)->errorCorrection('H')->generate($qrText));
+            $qrDataUri = 'data:image/svg+xml;base64,' . $qrCode;
+        }
 
-        $pangkatTtd = session('pangkat_ttd', 'Pembina Utama Muda, Gol. IV/c');
+        $pangkatTtd = session('pangkat_ttd', 'Pembina TK.I Gol. IV/b');
         $orientasiCetak = session('orientasi_cetak', 'landscape');
 
         $data = [
@@ -106,16 +112,18 @@ class IdulAdhaController extends Controller
             'nama_ttd'       => $namaTtd,
             'nip_ttd'        => $nipTtd,
             'pangkat_ttd'    => $pangkatTtd,
-            'jabatan_ttd'    => 'Kepala Bidang Peternakan dan Kesehatan Hewan',
+            'jabatan_ttd'    => 'Kepala Bidang Peternakan',
             'orientasi'      => $orientasiCetak,
             'gambar_ttd'     => session('gambar_ttd'),
             'gambar_stempel' => session('gambar_stempel'),
-            'qrCode'         => 'data:image/svg+xml;base64,' . $qrCode,
+            'qrCode'         => $qrDataUri,
         ];
 
         ini_set('max_execution_time', 300);
         ini_set('memory_limit', '2048M');
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('idul_adha.cetak_pdf', $data)->setPaper('A4', $orientasiCetak);
+        $pdf = \Barryvdh\Snappy\Facades\SnappyPdf::loadView('idul_adha.cetak_pdf', $data)
+                    ->setPaper('a4')
+                    ->setOrientation($orientasiCetak);
         return $pdf->download('Laporan_Pemotongan_Idul_Adha.pdf');
     }
 }

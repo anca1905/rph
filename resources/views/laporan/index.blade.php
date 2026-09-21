@@ -82,7 +82,11 @@
                     </button>
                 </div>
 
-                <div>
+                <div class="flex items-center gap-3">
+                    <select id="jenisTtd" class="px-3 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-xl focus:outline-none focus:border-green-500 shadow-sm">
+                        <option value="barcode">Cetak dengan Barcode</option>
+                        <option value="ttd_basah">Cetak TTD & Stempel Basah</option>
+                    </select>
                     <button onclick="openModalCetak()" type="button"
                         class="px-4 py-2 bg-slate-50 text-slate-700 border border-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm flex items-center gap-2">
                         <i class="fas fa-cog text-slate-500"></i> Atur Format Cetak
@@ -300,7 +304,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">{{ $labelPangkat }}</label>
                         <input type="text" name="pangkat_ttd" value="{{ session('pangkat_ttd', '') }}"
-                            placeholder="{{ $isDokter ? 'Contoh: Dokter Hewan' : 'Contoh: Pembina Utama Muda, Gol. IV/c' }}"
+                            placeholder="{{ $isDokter ? 'Contoh: Dokter Hewan' : 'Contoh: Pembina TK.I Gol. IV/b' }}"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-green-500">
                     </div>
                     <div>
@@ -442,8 +446,9 @@
                         "text-red-400");
                 }
 
+                let jenisTtd = document.getElementById('jenisTtd') ? document.getElementById('jenisTtd').value : 'barcode';
                 let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
-                    "&format=" + tipe;
+                    "&format=" + tipe + "&jenis_ttd=" + jenisTtd;
                 window.location.href = url;
             }
         }

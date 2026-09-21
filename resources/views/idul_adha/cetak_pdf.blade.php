@@ -127,61 +127,20 @@
     <div class="WordSection1">
 
         @php
-            if (!function_exists('hapusLatarPutih')) {
-                function hapusLatarPutih($filepath)
-                {
-                    if (!file_exists($filepath)) return '';
-                    $imgString = file_get_contents($filepath);
-                    if (!function_exists('imagecreatefromstring')) return $imgString;
-                    $img = @imagecreatefromstring($imgString);
-                    if (!$img) return $imgString;
-
-                    $w = imagesx($img);
-                    $h = imagesy($img);
-                    $out = imagecreatetruecolor($w, $h);
-                    imagesavealpha($out, true);
-                    $trans = imagecolorallocatealpha($out, 0, 0, 0, 127);
-                    imagefill($out, 0, 0, $trans);
-
-                    for ($x = 0; $x < $w; $x++) {
-                        for ($y = 0; $y < $h; $y++) {
-                            $rgb = imagecolorat($img, $x, $y);
-                            $colors = imagecolorsforindex($img, $rgb);
-                            if ($colors['red'] > 200 && $colors['green'] > 200 && $colors['blue'] > 200) {
-                                imagesetpixel($out, $x, $y, $trans);
-                            } else {
-                                imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, $colors['red'], $colors['green'], $colors['blue'], $colors['alpha']));
-                            }
-                        }
-                    }
-                    ob_start();
-                    imagepng($out);
-                    $imgData = ob_get_clean();
-                    imagedestroy($img);
-                    imagedestroy($out);
-                    return $imgData;
-                }
-            }
-
-            $imagePath = public_path('Lambang_Kab_Kolaka.jpg');
-            if (!file_exists($imagePath)) $imagePath = public_path('Lambang_Kab_Kolaka.PNG');
+            $logoPath = public_path('Lambang_Kab_Kolaka.png');
             $base64 = '';
-            if (file_exists($imagePath)) {
-                $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-                $dataImage = file_get_contents($imagePath);
-                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($dataImage);
+            if (file_exists($logoPath)) {
+                $base64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
             }
 
             $ttdBase64 = '';
             if (isset($gambar_ttd) && $gambar_ttd != '' && file_exists(public_path('uploads/' . $gambar_ttd))) {
-                $imgTransparan = hapusLatarPutih(public_path('uploads/' . $gambar_ttd));
-                $ttdBase64 = 'data:image/png;base64,' . base64_encode($imgTransparan);
+                $ttdBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('uploads/' . $gambar_ttd)));
             }
 
             $stempelBase64 = '';
             if (isset($gambar_stempel) && $gambar_stempel != '' && file_exists(public_path('uploads/' . $gambar_stempel))) {
-                $imgTransparan = hapusLatarPutih(public_path('uploads/' . $gambar_stempel));
-                $stempelBase64 = 'data:image/png;base64,' . base64_encode($imgTransparan);
+                $stempelBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('uploads/' . $gambar_stempel)));
             }
 
             $arrayBulan = [
@@ -195,7 +154,11 @@
             <tr>
                 <td width="15%" align="center" valign="middle">
                     @if ($base64 != '')
-                        <img src="{{ $base64 }}" width="90" height="115" alt="Logo Kolaka">
+                        @if(request('format') == 'word')
+                            <img src="{{ $base64 }}" width="90" height="115" alt="Logo Kolaka">
+                        @else
+                            <img src="{{ $base64 }}" width="90" alt="Logo Kolaka">
+                        @endif
                     @endif
                 </td>
                 <td width="85%" class="teks-kop" align="center" valign="middle">
@@ -276,17 +239,17 @@
             <tr>
                 <td width="60%"></td>
                 <td width="40%" align="left" style="font-size: 12pt; line-height: 1.2;">
-                    {{ $jabatan_ttd ?? 'Kepala Bidang Peternakan dan Kesehatan Hewan' }}<br>
+                    {{ $jabatan_ttd ?? 'Kepala Bidang Peternakan' }}<br>
                     Kabupaten Kolaka<br>
                     
                     <div style="margin: 5px 0; height: 110px; position: relative; display: block;">
                         @if(isset($qrCode))
                             @if(request('format') == 'word')
-                                <img src="{{ $qrCode }}" alt="QR Code" width="100" height="100">
+                                <img src="{{ $qrCode }}" alt="QR Code" width="115" height="115" style="margin-top: 5px;">
                             @else
-                                <img src="{{ $qrCode }}" alt="QR Code" width="100" height="100" style="position: absolute; top: 5px; left: 0; z-index: 1;">
+                                <img src="{{ $qrCode }}" alt="QR Code" width="120" height="120" style="position: absolute; top: 0; left: 0; z-index: 1;">
                                 @if(isset($base64) && $base64 != '')
-                                    <img src="{{ $base64 }}" width="20" height="25" style="position: absolute; top: 43px; left: 40px; background-color: white; z-index: 2; padding: 2px;">
+                                    <img src="{{ $base64 }}" width="15" height="20" style="position: absolute; top: 50px; left: 52px; background-color: white; z-index: 2; padding: 1px; border-radius: 2px;">
                                 @endif
                             @endif
                         @else
@@ -301,9 +264,9 @@
                         @endif
                     </div>
 
-                    {{ $nama_ttd ?? 'Hasbir Jaya Razak, SP' }}<br>
-                    {{ $pangkat_ttd ?? 'Pembina Utama Muda, Gol. IV/c' }}<br>
-                    NIP. {{ $nip_ttd ?? '19690914 199803 2 005' }}
+                    {{ $nama_ttd ?? 'Dr. drh. KASMAWATI, MM' }}<br>
+                    {{ $pangkat_ttd ?? 'Pembina TK.I Gol. IV/b' }}<br>
+                    NIP. {{ $nip_ttd ?? '19771202 200604 2 005' }}
                 </td>
             </tr>
         </table>

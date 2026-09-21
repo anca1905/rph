@@ -136,21 +136,32 @@ class LaporanController extends Controller
         }
 
         $isDokter = in_array($jenis_laporan, ['antemortem', 'postmortem']);
-        $jabatanTtd = $isDokter ? 'Dokter Hewan' : 'Kepala Bidang Peternakan dan Kesehatan Hewan';
+        $jabatanTtd = $isDokter ? 'Dokter Hewan' : 'Kepala Bidang Peternakan';
 
-        $namaTtd = session('nama_ttd', $isDokter ? 'drh. Nama Dokter' : 'Hasbir Jaya Razak, SP');
-        $nipTtd = session('nip_ttd', $isDokter ? 'NIP Dokter' : '19690914 199803 2 005');
-        $pangkatTtd = session('pangkat_ttd', $isDokter ? 'Dokter Hewan' : 'Pembina Utama Muda, Gol. IV/c');
+        $namaTtd = session('nama_ttd', $isDokter ? 'drh. Nama Dokter' : 'Dr. drh. KASMAWATI, MM');
+        $nipTtd = session('nip_ttd', $isDokter ? 'NIP Dokter' : '19771202 200604 2 005');
+        $pangkatTtd = session('pangkat_ttd', $isDokter ? 'Dokter Hewan' : 'Pembina TK.I Gol. IV/b');
         $orientasiCetak = session('orientasi_cetak', 'landscape');
 
-        $qrText = "Naskah ini telah tertandatangan oleh:\n";
-        $qrText .= "Nama: " . $namaTtd . "\n";
-        $qrText .= "Jabatan: " . $jabatanTtd . "\n";
-        $qrText .= "Unit Kerja: Dinas Perkebunan dan Peternakan\n";
-        $qrText .= "Instansi: Pemerintah Kabupaten Kolaka\n";
-        $qrText .= "Ditandatangani pada: " . \Carbon\Carbon::now()->translatedFormat('d F Y H:i:s');
-        
-        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(1)->size(100)->errorCorrection('H')->generate($qrText));
+        $jenisTtd = $request->input('jenis_ttd', 'barcode');
+        $qrDataUri = null;
+
+        if ($jenisTtd == 'barcode') {
+            $qrText = "Naskah ini telah tertandatangan oleh:\n";
+            $qrText .= "Nama: " . $namaTtd . "\n";
+            $qrText .= "Jabatan: " . $jabatanTtd . "\n";
+            $qrText .= "Unit Kerja: Dinas Perkebunan dan Peternakan\n";
+            $qrText .= "Instansi: Pemerintah Kabupaten Kolaka\n";
+            $qrText .= "Ditandatangani pada: " . \Carbon\Carbon::now()->translatedFormat('d F Y H:i:s');
+            
+            try {
+                $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->margin(1)->size(400)->errorCorrection('H')->generate($qrText));
+                $qrDataUri = 'data:image/png;base64,' . $qrCode;
+            } catch (\Exception $e) {
+                $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(1)->size(400)->errorCorrection('H')->generate($qrText));
+                $qrDataUri = 'data:image/svg+xml;base64,' . $qrCode;
+            }
+        }
 
         $data = [
             'jenis_laporan'  => $jenis_laporan,
@@ -165,13 +176,15 @@ class LaporanController extends Controller
             'orientasi'      => $orientasiCetak,
             'gambar_ttd'     => session('gambar_ttd'),
             'gambar_stempel' => session('gambar_stempel'),
-            'qrCode'         => 'data:image/svg+xml;base64,' . $qrCode,
+            'qrCode'         => $qrDataUri,
         ];
 
         if ($format == 'pdf') {
             ini_set('max_execution_time', 300);
             ini_set('memory_limit', '2048M');
-            $pdf = Pdf::loadView('laporan.cetak', $data)->setPaper('A4', $orientasiCetak);
+            $pdf = \Barryvdh\Snappy\Facades\SnappyPdf::loadView('laporan.cetak', $data)
+                        ->setPaper('a4')
+                        ->setOrientation($orientasiCetak);
             return $pdf->download('Laporan_RPH_'.$jenis_laporan.'.pdf');
         } elseif ($format == 'word') {
             $headers = [
