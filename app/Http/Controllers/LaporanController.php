@@ -174,8 +174,8 @@ class LaporanController extends Controller
             'pangkat_ttd'    => $pangkatTtd,
             'jabatan_ttd'    => $jabatanTtd,
             'orientasi'      => $orientasiCetak,
-            'gambar_ttd'     => session('gambar_ttd'),
-            'gambar_stempel' => session('gambar_stempel'),
+            'gambar_ttd'     => session('gambar_ttd', 'ttd_laporan.png'),
+            'gambar_stempel' => session('gambar_stempel', 'stempel_laporan.png'),
             'qrCode'         => $qrDataUri,
         ];
 
