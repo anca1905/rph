@@ -129,6 +129,12 @@
                                 class="fas fa-cow w-5 text-center {{ Request::is('hewan') ? 'text-green-500' : 'text-emerald-400 group-hover:text-green-300' }} transition-colors"></i>
                             <span class="mx-3 text-sm">Data Hewan</span>
                         </a>
+                        <a href="{{ url('/hewan/tolak') }}"
+                            class="group flex items-center px-3 py-2 rounded-xl transition-all duration-300 {{ Request::is('hewan/tolak') ? 'bg-white text-emerald-800 shadow-md font-bold translate-x-1' : 'text-emerald-100 hover:bg-white/10 hover:text-white font-medium' }}">
+                            <i
+                                class="fas fa-times-circle w-5 text-center {{ Request::is('hewan/tolak') ? 'text-green-500' : 'text-emerald-400 group-hover:text-green-300' }} transition-colors"></i>
+                            <span class="mx-3 text-sm">Data Hewan Tolak</span>
+                        </a>
                     @endif
 
                     @if (auth()->check() && in_array(auth()->user()->role, ['petugas', 'admin', 'pimpinan', 'pekerja_idul_adha']))

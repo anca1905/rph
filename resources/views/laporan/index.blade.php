@@ -19,7 +19,7 @@
             Laporan</h3>
 
         <form action="{{ route('laporan.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-2">Tanggal Mulai</label>
@@ -56,6 +56,16 @@
                     </select>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-2">Status Laporan (Khusus Hewan)</label>
+                    <select name="status_laporan"
+                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 font-medium text-sm rounded-xl focus:outline-none focus:border-green-500 transition-colors shadow-inner">
+                        <option value="semua" {{ (isset($status_laporan) && $status_laporan == 'semua') || empty($status_laporan) ? 'selected' : '' }}>Semua Status</option>
+                        <option value="disetujui" {{ isset($status_laporan) && $status_laporan == 'disetujui' ? 'selected' : '' }}>Hanya Disetujui / Lolos</option>
+                        <option value="ditolak" {{ isset($status_laporan) && $status_laporan == 'ditolak' ? 'selected' : '' }}>Hanya Ditolak</option>
+                    </select>
+                </div>
+
                 <div class="flex gap-2">
                     <button type="submit"
                         class="w-full px-4 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-sm flex justify-center items-center gap-2">
@@ -85,7 +95,7 @@
                 <div class="flex items-center gap-3">
                     <select id="jenisTtd" class="px-3 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-xl focus:outline-none focus:border-green-500 shadow-sm">
                         <option value="barcode">Cetak dengan Barcode</option>
-                        <option value="ttd_basah">Cetak TTD & Stempel Basah</option>
+                        <option value="ttd_basah">Cetak Tanda Tangan Basah</option>
                     </select>
                     <button onclick="openModalCetak()" type="button"
                         class="px-4 py-2 bg-slate-50 text-slate-700 border border-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm flex items-center gap-2">
@@ -153,6 +163,11 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kelamin</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
+                                @if(!isset($status_laporan) || $status_laporan == 'semua')
+                                    <th class="px-4 py-4 border-b border-slate-100">Status</th>
+                                @elseif($status_laporan == 'ditolak')
+                                    <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
+                                @endif
                             @elseif($jenis_laporan == 'pembayaran')
                                 <th class="px-4 py-4 border-b border-slate-100">No Registrasi</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Nama Pemilik</th>
@@ -170,6 +185,11 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kategori</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
+                                @if(!isset($status_laporan) || $status_laporan == 'semua')
+                                    <th class="px-4 py-4 border-b border-slate-100">Status</th>
+                                @elseif($status_laporan == 'ditolak')
+                                    <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
+                                @endif
                                 <th class="px-4 py-4 border-b border-slate-100">Tgl Periksa</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Status AM</th>
                             @elseif($jenis_laporan == 'pemotongan')
@@ -211,6 +231,11 @@
                                     <td class="px-4 py-3">{{ $row->jenis_kelamin }}</td>
                                     <td class="px-4 py-3">{{ $row->umur ?? '-' }}</td>
                                     <td class="px-4 py-3 font-semibold">{{ $row->berat ?? '-' }} Kg</td>
+                                    @if(!isset($status_laporan) || $status_laporan == 'semua')
+                                        <td class="px-4 py-3">{{ $row->status }}</td>
+                                    @elseif($status_laporan == 'ditolak')
+                                        <td class="px-4 py-3">{{ $row->status }}</td>
+                                    @endif
                                 @elseif($jenis_laporan == 'pembayaran')
                                     <td class="px-4 py-3 font-bold">{{ $row->hewan->no_registrasi ?? '-' }}</td>
                                     <td class="px-4 py-3 font-medium">{{ $row->hewan->nama_pemilik ?? '-' }}</td>
@@ -447,7 +472,8 @@
                 }
 
                 let jenisTtd = document.getElementById('jenisTtd') ? document.getElementById('jenisTtd').value : 'barcode';
-                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
+                let statusLaporan = document.querySelector('select[name="status_laporan"]').value;
+                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat + "&status_laporan=" + statusLaporan +
                     "&format=" + tipe + "&jenis_ttd=" + jenisTtd;
                 window.location.href = url;
             }

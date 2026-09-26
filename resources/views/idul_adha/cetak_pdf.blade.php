@@ -253,13 +253,9 @@
                                 @endif
                             @endif
                         @else
-                            @if ($stempelBase64 != '')
-                                <img src="{{ $stempelBase64 }}" width="95" height="95" alt="Stempel"
-                                    style="position: absolute; top: 0; left: 0; z-index: 1;">
-                            @endif
                             @if ($ttdBase64 != '')
                                 <img src="{{ $ttdBase64 }}" width="130" height="80" alt="TTD"
-                                    style="position: absolute; top: 5px; left: 40px; z-index: 2;">
+                                    style="position: absolute; top: 5px; left: 0; z-index: 2;">
                             @endif
                         @endif
                     </div>

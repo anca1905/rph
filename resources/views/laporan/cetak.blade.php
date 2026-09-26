@@ -223,6 +223,11 @@
             @if (!empty($kategori))
                 Kategori Hewan &nbsp;&nbsp;&nbsp;: {{ $kategori }}
             @endif
+            @if(isset($status_laporan) && $status_laporan == 'disetujui')
+                <br>Status Data &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Disetujui (Lolos)
+            @elseif(isset($status_laporan) && $status_laporan == 'ditolak')
+                <br>Status Data &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Ditolak
+            @endif
         </div>
 
         @if ($jenis_laporan == 'pengawasan')
@@ -357,6 +362,11 @@
                         <th>Kelamin</th>
                         <th>Umur</th>
                         <th>Berat</th>
+                        @if(!isset($status_laporan) || $status_laporan == 'semua')
+                            <th>Status</th>
+                        @elseif($status_laporan == 'ditolak')
+                            <th>Keterangan</th>
+                        @endif
                     @elseif($jenis_laporan == 'idul_adha')
                         <th>Tanggal</th>
                         <th>Lokasi / Instansi</th>
@@ -383,6 +393,11 @@
                         <th>Kategori</th>
                         <th>Umur</th>
                         <th>Berat</th>
+                        @if(!isset($status_laporan) || $status_laporan == 'semua')
+                            <th>Status</th>
+                        @elseif($status_laporan == 'ditolak')
+                            <th>Keterangan</th>
+                        @endif
                         <th>Tgl Periksa</th>
                         <th>Kondisi Fisik</th>
                         <th>Tanda Penyakit</th>
@@ -428,6 +443,11 @@
                                 <td>{{ $row->jenis_kelamin }}</td>
                                 <td>{{ $row->umur ?? '-' }}</td>
                                 <td>{{ $row->berat ?? '-' }} Kg</td>
+                                @if(!isset($status_laporan) || $status_laporan == 'semua')
+                                    <td>{{ $row->status }}</td>
+                                @elseif($status_laporan == 'ditolak')
+                                    <td class="text-left" style="font-size: 8pt;">{{ $row->status }}</td>
+                                @endif
                             @elseif($jenis_laporan == 'idul_adha')
                                 <td>{{ \Carbon\Carbon::parse($row->tanggal)->format('d/m/Y') }}</td>
                                 <td class="text-left font-bold">{{ $row->nama_lokasi }}</td>
@@ -528,13 +548,9 @@
                                 @endif
                             @endif
                         @else
-                            @if ($stempelBase64 != '')
-                                <img src="{{ $stempelBase64 }}" width="95" height="95" alt="Stempel"
-                                    style="position: absolute; top: 0; left: 0; z-index: 1;">
-                            @endif
                             @if ($ttdBase64 != '')
                                 <img src="{{ $ttdBase64 }}" width="130" height="80" alt="TTD"
-                                    style="position: absolute; top: 5px; left: 40px; z-index: 2;">
+                                    style="position: absolute; top: 5px; left: 0; z-index: 2;">
                             @endif
                         @endif
                     </div>

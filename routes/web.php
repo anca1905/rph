@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
     // --> AKSES MONITORING (Petugas, Admin, Pimpinan, Pekerja Idul Adha)
     Route::middleware(['role:petugas,admin,pimpinan,pekerja_idul_adha'])->group(function () {
         Route::get('/hewan', [HewanController::class, 'index'])->name('hewan.index');
+        Route::get('/hewan/tolak', [HewanController::class, 'tolak'])->name('hewan.tolak');
         Route::get('/idul_adha', [IdulAdhaController::class, 'index'])->name('idul_adha.index');
         Route::get('/idul_adha/export/pdf', [IdulAdhaController::class, 'exportPdf'])->name('idul_adha.export_pdf');
         Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
