@@ -48,7 +48,7 @@ class PemotonganController extends Controller
 
         // Ambil SEMUA data hewan harian beserta relasi pemotongannya
         // Jika butuh filter tabel, bisa ditambah di sini. Untuk sekarang ikuti yang ada:
-        $hewans = Hewan::where('kategori', 'Hewan Harian')
+        $hewans = Hewan::where('kategori', 'Hewan Harian')->where('status', 'not like', '%Ditolak%')
                        ->with(['pemotongan', 'pembayaran', 'antemortem'])
                        ->latest()
                        ->get();

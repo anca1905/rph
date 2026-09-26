@@ -19,7 +19,7 @@
             Laporan</h3>
 
         <form action="{{ route('laporan.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-2">Tanggal Mulai</label>
@@ -40,6 +40,8 @@
                         <option value="">-- Pilih Jenis Data --</option>
                         <option value="hewan" {{ isset($jenis_laporan) && $jenis_laporan == 'hewan' ? 'selected' : '' }}>
                             Data Hewan (Reguler)</option>
+                        <option value="hewan_ditolak" {{ isset($jenis_laporan) && $jenis_laporan == 'hewan_ditolak' ? 'selected' : '' }}>
+                            Data Hewan Ditolak</option>
 
                         <option value="pembayaran"
                             {{ isset($jenis_laporan) && $jenis_laporan == 'pembayaran' ? 'selected' : '' }}>Data Pembayaran
@@ -153,7 +155,7 @@
                     <thead class="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider">
                         <tr>
                             <th class="px-4 py-4 border-b border-slate-100 text-center">No</th>
-                            @if ($jenis_laporan == 'hewan')
+                            @if (in_array($jenis_laporan, ['hewan', 'hewan_ditolak']))
                                 <th class="px-4 py-4 border-b border-slate-100">No Registrasi</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Tgl Masuk</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Nama Pemilik</th>
@@ -163,11 +165,10 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kelamin</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
-                                @if(!isset($status_laporan) || $status_laporan == 'semua')
-                                    <th class="px-4 py-4 border-b border-slate-100">Status</th>
-                                @elseif($status_laporan == 'ditolak')
+                                @if($jenis_laporan == 'hewan_ditolak')
                                     <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
                                 @endif
+
                             @elseif($jenis_laporan == 'pembayaran')
                                 <th class="px-4 py-4 border-b border-slate-100">No Registrasi</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Nama Pemilik</th>
@@ -185,11 +186,10 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kategori</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
-                                @if(!isset($status_laporan) || $status_laporan == 'semua')
-                                    <th class="px-4 py-4 border-b border-slate-100">Status</th>
-                                @elseif($status_laporan == 'ditolak')
+                                @if($jenis_laporan == 'hewan_ditolak')
                                     <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
                                 @endif
+
                                 <th class="px-4 py-4 border-b border-slate-100">Tgl Periksa</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Status AM</th>
                             @elseif($jenis_laporan == 'pemotongan')
@@ -220,7 +220,7 @@
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <td class="px-4 py-3 text-center">{{ $loop->iteration }}</td>
 
-                                @if ($jenis_laporan == 'hewan')
+                                @if (in_array($jenis_laporan, ['hewan', 'hewan_ditolak']))
                                     <td class="px-4 py-3 font-bold">{{ $row->no_registrasi }}</td>
                                     <td class="px-4 py-3">
                                         {{ \Carbon\Carbon::parse($row->tanggal_masuk)->format('d/m/Y') }}</td>
@@ -231,11 +231,10 @@
                                     <td class="px-4 py-3">{{ $row->jenis_kelamin }}</td>
                                     <td class="px-4 py-3">{{ $row->umur ?? '-' }}</td>
                                     <td class="px-4 py-3 font-semibold">{{ $row->berat ?? '-' }} Kg</td>
-                                    @if(!isset($status_laporan) || $status_laporan == 'semua')
-                                        <td class="px-4 py-3">{{ $row->status }}</td>
-                                    @elseif($status_laporan == 'ditolak')
+                                    @if($jenis_laporan == 'hewan_ditolak')
                                         <td class="px-4 py-3">{{ $row->status }}</td>
                                     @endif
+
                                 @elseif($jenis_laporan == 'pembayaran')
                                     <td class="px-4 py-3 font-bold">{{ $row->hewan->no_registrasi ?? '-' }}</td>
                                     <td class="px-4 py-3 font-medium">{{ $row->hewan->nama_pemilik ?? '-' }}</td>
@@ -472,8 +471,7 @@
                 }
 
                 let jenisTtd = document.getElementById('jenisTtd') ? document.getElementById('jenisTtd').value : 'barcode';
-                let statusLaporan = document.querySelector('select[name="status_laporan"]').value;
-                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat + "&status_laporan=" + statusLaporan +
+                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
                     "&format=" + tipe + "&jenis_ttd=" + jenisTtd;
                 window.location.href = url;
             }

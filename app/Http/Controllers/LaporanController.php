@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\File;
 
 class LaporanController extends Controller
 {
-    private function getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan = "")
+    private function getLaporanData($jenis_laporan, $start_date, $end_date, $kategori)
     {
         $dataLaporan = [];
 
@@ -23,7 +23,11 @@ class LaporanController extends Controller
             
             switch ($jenis_laporan) {
                 case 'hewan':
-                    $query = Hewan::where('kategori', 'Hewan Harian');
+                    $query = Hewan::where('kategori', 'Hewan Harian')->where('status', 'not like', '%Ditolak%');
+                    $dateField = 'tanggal_masuk';
+                    break;
+                case 'hewan_ditolak':
+                    $query = Hewan::where('kategori', 'Hewan Harian')->where('status', 'like', '%Ditolak%');
                     $dateField = 'tanggal_masuk';
                     break;
                 case 'pengawasan':
@@ -64,12 +68,6 @@ class LaporanController extends Controller
                 }
                 
                 
-                if ($jenis_laporan == 'hewan' && $status_laporan == 'ditolak') {
-                    $query->where('status', 'like', '%Ditolak%');
-                } elseif ($jenis_laporan == 'hewan' && $status_laporan == 'disetujui') {
-                    $query->where('status', 'not like', '%Ditolak%');
-                }
-                
                 $dataLaporan = $query->latest($dateField)->get();
             }
         }
@@ -82,11 +80,11 @@ class LaporanController extends Controller
         $jenis_laporan = $request->input('jenis_laporan');
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
-        $kategori = $request->input("kategori", "");
-        $status_laporan = $request->input("status_laporan", "");
-        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan);
+        $kategori = $request->input('kategori', '');
+        
+        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori);
 
-        return view("laporan.index", compact("jenis_laporan", "start_date", "end_date", "kategori", "status_laporan", "dataLaporan"));
+        return view('laporan.index', compact('jenis_laporan', 'start_date', 'end_date', 'kategori', 'dataLaporan'));
     }
 
     // FUNGSI BARU: Menyimpan Pengaturan Cetak ke Session & Server
@@ -132,10 +130,9 @@ class LaporanController extends Controller
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
         $kategori = $request->input('kategori', '');
-        $format = $request->input("format");
+        $format = $request->input('format');
 
-        $status_laporan = $request->input("status_laporan", "");
-        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan);
+        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori);
 
         if (!empty($kategori) && in_array($jenis_laporan, ['antemortem', 'pemotongan', 'postmortem'])) {
             $dataLaporan = $dataLaporan->filter(function($item) use ($kategori) {
@@ -175,9 +172,8 @@ class LaporanController extends Controller
             'jenis_laporan'  => $jenis_laporan,
             'start_date'     => $start_date,
             'end_date'       => $end_date,
-            "kategori"       => $kategori,
-            "status_laporan" => $status_laporan,
-            "dataLaporan"    => $dataLaporan,
+                        'kategori'       => $kategori,
+            'dataLaporan'    => $dataLaporan,
             'nama_ttd'       => $namaTtd,
             'nip_ttd'        => $nipTtd,
             'pangkat_ttd'    => $pangkatTtd,

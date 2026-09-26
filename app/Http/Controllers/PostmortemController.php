@@ -13,7 +13,7 @@ class PostmortemController extends Controller
     public function index()
     {
         // Ambil SEMUA data hewan harian beserta relasi postmortemnya
-        $hewans = Hewan::where('kategori', 'Hewan Harian')
+        $hewans = Hewan::where('kategori', 'Hewan Harian')->where('status', 'not like', '%Ditolak%')
                        ->with(['postmortem', 'pemotongan'])
                        ->latest()
                        ->get();

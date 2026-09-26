@@ -213,7 +213,7 @@
                 <span class="underline">LAPORAN HARIAN PENGAWASAN TERNAK</span><br>
                 <span>DI RUMAH POTONG HEWAN (RPH) {{ strtoupper(\Carbon\Carbon::now()->translatedFormat('F Y')) }}</span>
             @else
-                <span class="underline">LAPORAN DATA {{ str_replace('_', ' ', strtoupper($jenis_laporan)) }}</span>
+                <span class="underline">LAPORAN DATA {{ strtoupper(str_replace('_', ' ', $jenis_laporan == 'hewan_ditolak' ? 'hewan_ditolak' : $jenis_laporan)) }}</span>
                 <span class="nomor-surat">No. {{ $nomorSurat }}</span>
             @endif
         </div>
@@ -222,11 +222,6 @@
             Tanggal Diunduh : {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }} <br>
             @if (!empty($kategori))
                 Kategori Hewan &nbsp;&nbsp;&nbsp;: {{ $kategori }}
-            @endif
-            @if(isset($status_laporan) && $status_laporan == 'disetujui')
-                <br>Status Data &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Disetujui (Lolos)
-            @elseif(isset($status_laporan) && $status_laporan == 'ditolak')
-                <br>Status Data &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Ditolak
             @endif
         </div>
 
@@ -352,7 +347,7 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    @if ($jenis_laporan == 'hewan')
+                    @if (in_array($jenis_laporan, ['hewan', 'hewan_ditolak']))
                         <th>No Registrasi</th>
                         <th>Tgl Masuk</th>
                         <th>Nama Pemilik</th>
@@ -362,9 +357,7 @@
                         <th>Kelamin</th>
                         <th>Umur</th>
                         <th>Berat</th>
-                        @if(!isset($status_laporan) || $status_laporan == 'semua')
-                            <th>Status</th>
-                        @elseif($status_laporan == 'ditolak')
+                        @if($jenis_laporan == 'hewan_ditolak')
                             <th>Keterangan</th>
                         @endif
                     @elseif($jenis_laporan == 'idul_adha')
@@ -393,9 +386,7 @@
                         <th>Kategori</th>
                         <th>Umur</th>
                         <th>Berat</th>
-                        @if(!isset($status_laporan) || $status_laporan == 'semua')
-                            <th>Status</th>
-                        @elseif($status_laporan == 'ditolak')
+                        @if($jenis_laporan == 'hewan_ditolak')
                             <th>Keterangan</th>
                         @endif
                         <th>Tgl Periksa</th>
@@ -433,7 +424,7 @@
                     @foreach ($dataLaporan as $index => $row)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            @if ($jenis_laporan == 'hewan')
+                            @if (in_array($jenis_laporan, ['hewan', 'hewan_ditolak']))
                                 <td>{{ $row->no_registrasi }}</td>
                                 <td>{{ \Carbon\Carbon::parse($row->tanggal_masuk)->format('d/m/Y') }}</td>
                                 <td class="text-left">{{ $row->nama_pemilik }}</td>
@@ -443,9 +434,7 @@
                                 <td>{{ $row->jenis_kelamin }}</td>
                                 <td>{{ $row->umur ?? '-' }}</td>
                                 <td>{{ $row->berat ?? '-' }} Kg</td>
-                                @if(!isset($status_laporan) || $status_laporan == 'semua')
-                                    <td>{{ $row->status }}</td>
-                                @elseif($status_laporan == 'ditolak')
+                                @if($jenis_laporan == 'hewan_ditolak')
                                     <td class="text-left" style="font-size: 8pt;">{{ $row->status }}</td>
                                 @endif
                             @elseif($jenis_laporan == 'idul_adha')

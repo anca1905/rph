@@ -11,13 +11,14 @@ class HewanController extends Controller
 {
     public function index()
     {
-        $hewans = Hewan::orderBy('tanggal_masuk', 'desc')->get();
+        $hewans = Hewan::where('status', 'not like', '%Ditolak%')->orderBy('tanggal_masuk', 'desc')->get();
 
         $lastPH = Hewan::where('no_registrasi', 'like', 'PH-%')->orderBy('id_hewan', 'desc')->first();
         $nextPH = $lastPH ? 'PH-' . str_pad(intval(substr($lastPH->no_registrasi, 3)) + 1, 3, '0', STR_PAD_LEFT) : 'PH-001';
 
         return view('hewan.index', compact('hewans', 'nextPH'));
     }
+
 
     public function store(Request $request)
     {
