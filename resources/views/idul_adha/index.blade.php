@@ -66,10 +66,10 @@
                         class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md shadow-emerald-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
                         <i class="fas fa-plus-circle"></i> Input Laporan
                     </button>
-                    <button onclick="toggleModal('modalImport')"
+                    <!-- <button onclick="toggleModal('modalImport')"
                         class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md shadow-blue-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
                         <i class="fas fa-file-import"></i> Import Excel
-                    </button>
+                    </button> -->
                 @endif
                 <button onclick="exportExcelIdulAdha()"
                     class="px-4 py-2 bg-slate-50 text-slate-700 border border-slate-200 text-sm font-semibold rounded-xl hover:bg-slate-100 transition-colors shadow-sm flex items-center gap-2">

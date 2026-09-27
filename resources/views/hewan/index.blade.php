@@ -77,10 +77,10 @@
                         class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-sm flex items-center gap-2">
                         <i class="fas fa-plus"></i> Tambah Data
                     </button>
-                    <button onclick="toggleModal('modalImport')"
+                    <!-- <button onclick="toggleModal('modalImport')"
                         class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md flex items-center gap-2">
                         <i class="fas fa-file-import"></i> Import Excel
-                    </button>
+                    </button> -->
                 @endif
             </div>
         </div>
