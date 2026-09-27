@@ -272,7 +272,7 @@
                         Import Data dari Excel</h3>
                     <button type="button" onclick="toggleModal('modalImport')" class="text-blue-100 hover:text-white transition-colors focus:outline-none"><i class="fas fa-times text-xl"></i></button>
                 </div>
-                <form action="{{ route('idul_adha.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col">
+                <form action="#" method="POST" enctype="multipart/form-data" class="flex flex-col">
                     @csrf
                     <div class="px-6 py-5 bg-slate-50/50">
                         <div class="mb-4">
