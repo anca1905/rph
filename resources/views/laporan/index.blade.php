@@ -58,16 +58,6 @@
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-2">Status Laporan (Khusus Hewan)</label>
-                    <select name="status_laporan"
-                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 font-medium text-sm rounded-xl focus:outline-none focus:border-green-500 transition-colors shadow-inner">
-                        <option value="semua" {{ (isset($status_laporan) && $status_laporan == 'semua') || empty($status_laporan) ? 'selected' : '' }}>Semua Status</option>
-                        <option value="disetujui" {{ isset($status_laporan) && $status_laporan == 'disetujui' ? 'selected' : '' }}>Hanya Disetujui / Lolos</option>
-                        <option value="ditolak" {{ isset($status_laporan) && $status_laporan == 'ditolak' ? 'selected' : '' }}>Hanya Ditolak</option>
-                    </select>
-                </div>
-
                 <div class="flex gap-2">
                     <button type="submit"
                         class="w-full px-4 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-sm flex justify-center items-center gap-2">
