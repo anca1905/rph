@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\File;
 
 class LaporanController extends Controller
 {
-    private function getLaporanData($jenis_laporan, $start_date, $end_date, $kategori)
+    private function getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan = 'semua')
     {
         $dataLaporan = [];
 
@@ -23,7 +23,28 @@ class LaporanController extends Controller
             
             switch ($jenis_laporan) {
                 case 'hewan':
-                    $query = Hewan::where('kategori', 'Hewan Harian')->where('status', 'not like', '%Ditolak%');
+                    $query = Hewan::with(['antemortem', 'postmortem']);
+                    if ($status_laporan == 'ditolak') {
+                        $query->where(function ($q) {
+                            $q->where('status', 'like', '%Ditolak%')
+                              ->orWhereHas('antemortem', function ($qa) {
+                                  $qa->where('status_antemortem', 'like', '%Ditolak%');
+                              })
+                              ->orWhereHas('postmortem', function ($qp) {
+                                  $qp->where('kondisi_karkas', 'like', '%Ditolak%')
+                                     ->orWhere('kondisi_jeroan', 'like', '%Ditolak%');
+                              });
+                        });
+                    } elseif ($status_laporan == 'disetujui') {
+                        $query->where('status', 'not like', '%Ditolak%')
+                              ->whereDoesntHave('antemortem', function ($qa) {
+                                  $qa->where('status_antemortem', 'like', '%Ditolak%');
+                              })
+                              ->whereDoesntHave('postmortem', function ($qp) {
+                                  $qp->where('kondisi_karkas', 'like', '%Ditolak%')
+                                     ->orWhere('kondisi_jeroan', 'like', '%Ditolak%');
+                              });
+                    }
                     $dateField = 'tanggal_masuk';
                     break;
                 case 'hewan_ditolak':
@@ -69,7 +90,9 @@ class LaporanController extends Controller
             }
 
             if ($query instanceof \Illuminate\Database\Eloquent\Builder) {
-                if ($jenis_laporan == 'hewan_ditolak') {
+                $isDitolakFilter = ($jenis_laporan == 'hewan_ditolak') || ($jenis_laporan == 'hewan' && $status_laporan == 'ditolak');
+
+                if ($isDitolakFilter) {
                     if (!empty($start_date) && !empty($end_date)) {
                         $query->where(function ($q) use ($start_date, $end_date) {
                             $q->whereBetween('tanggal_masuk', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
@@ -116,10 +139,11 @@ class LaporanController extends Controller
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
         $kategori = $request->input('kategori', '');
+        $status_laporan = $request->input('status_laporan', 'semua');
         
-        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori);
+        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan);
 
-        return view('laporan.index', compact('jenis_laporan', 'start_date', 'end_date', 'kategori', 'dataLaporan'));
+        return view('laporan.index', compact('jenis_laporan', 'start_date', 'end_date', 'kategori', 'status_laporan', 'dataLaporan'));
     }
 
     // FUNGSI BARU: Menyimpan Pengaturan Cetak ke Session & Server
@@ -166,8 +190,9 @@ class LaporanController extends Controller
         $end_date = $request->input('end_date');
         $kategori = $request->input('kategori', '');
         $format = $request->input('format');
+        $status_laporan = $request->input('status_laporan', 'semua');
 
-        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori);
+        $dataLaporan = $this->getLaporanData($jenis_laporan, $start_date, $end_date, $kategori, $status_laporan);
 
         if (!empty($kategori) && in_array($jenis_laporan, ['antemortem', 'pemotongan', 'postmortem'])) {
             $dataLaporan = $dataLaporan->filter(function($item) use ($kategori) {
@@ -205,9 +230,10 @@ class LaporanController extends Controller
 
         $data = [
             'jenis_laporan'  => $jenis_laporan,
+            'status_laporan' => $status_laporan,
             'start_date'     => $start_date,
             'end_date'       => $end_date,
-                        'kategori'       => $kategori,
+            'kategori'       => $kategori,
             'dataLaporan'    => $dataLaporan,
             'nama_ttd'       => $namaTtd,
             'nip_ttd'        => $nipTtd,

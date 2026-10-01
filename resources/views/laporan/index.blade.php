@@ -19,7 +19,7 @@
             Laporan</h3>
 
         <form action="{{ route('laporan.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-2">Tanggal Mulai</label>
@@ -55,6 +55,16 @@
                         <option value="postmortem"
                             {{ isset($jenis_laporan) && $jenis_laporan == 'postmortem' ? 'selected' : '' }}>Data
                             Pemeriksaan Postmortem</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-2">Status Laporan</label>
+                    <select name="status_laporan"
+                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 font-medium text-sm rounded-xl focus:outline-none focus:border-green-500 transition-colors shadow-inner">
+                        <option value="semua" {{ (isset($status_laporan) && $status_laporan == 'semua') || empty($status_laporan) ? 'selected' : '' }}>Semua Status</option>
+                        <option value="disetujui" {{ isset($status_laporan) && $status_laporan == 'disetujui' ? 'selected' : '' }}>Hanya Disetujui / Lolos</option>
+                        <option value="ditolak" {{ isset($status_laporan) && $status_laporan == 'ditolak' ? 'selected' : '' }}>Hanya Ditolak</option>
                     </select>
                 </div>
 
@@ -155,9 +165,7 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kelamin</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
-                                @if($jenis_laporan == 'hewan_ditolak')
-                                    <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
-                                @endif
+                                <th class="px-4 py-4 border-b border-slate-100">Status</th>
 
                             @elseif($jenis_laporan == 'pembayaran')
                                 <th class="px-4 py-4 border-b border-slate-100">No Registrasi</th>
@@ -218,16 +226,19 @@
                                     <td class="px-4 py-3">{{ $row->jenis_kelamin }}</td>
                                     <td class="px-4 py-3">{{ $row->umur ?? '-' }}</td>
                                     <td class="px-4 py-3 font-semibold">{{ $row->berat ?? '-' }} Kg</td>
-                                    @if($jenis_laporan == 'hewan_ditolak')
                                         <td class="px-4 py-3">
                                             @if(str_contains($row->status, 'Ditolak'))
-                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">{{ $row->status }}</span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200"><i class="fas fa-times-circle text-[9px] mr-1"></i> {{ $row->status }}</span>
                                             @elseif($row->antemortem && str_contains($row->antemortem->status_antemortem, 'Ditolak'))
-                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">Ditolak Antemortem</span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200"><i class="fas fa-times-circle text-[9px] mr-1"></i> Ditolak Antemortem</span>
                                             @elseif($row->postmortem && (str_contains($row->postmortem->kondisi_karkas, 'Ditolak') || str_contains($row->postmortem->kondisi_jeroan, 'Ditolak')))
-                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">Ditolak Postmortem</span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200"><i class="fas fa-times-circle text-[9px] mr-1"></i> Ditolak Postmortem</span>
+                                            @elseif(str_contains($row->status, 'Lolos') || $row->status == 'Selesai Dipotong')
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200"><i class="fas fa-check-circle text-[9px] mr-1"></i> {{ $row->status }}</span>
+                                            @elseif($row->status == 'Karantina Sementara')
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-200"><i class="fas fa-bed text-[9px] mr-1"></i> {{ $row->status }}</span>
                                             @else
-                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">{{ $row->status }}</span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200"><i class="fas fa-hourglass-half text-[9px] mr-1"></i> {{ $row->status ?? 'Menunggu Antemortem' }}</span>
                                             @endif
 
                                             @if($row->antemortem && $row->antemortem->tanda_penyakit && $row->antemortem->tanda_penyakit != 'Tidak Ada')
@@ -237,7 +248,6 @@
                                                 <div class="text-xs text-slate-400 mt-0.5">{!! strip_tags($row->antemortem->catatan) !!}</div>
                                             @endif
                                         </td>
-                                    @endif
 
                                 @elseif($jenis_laporan == 'pembayaran')
                                     <td class="px-4 py-3 font-bold">{{ $row->hewan->no_registrasi ?? '-' }}</td>
@@ -475,7 +485,8 @@
                 }
 
                 let jenisTtd = document.getElementById('jenisTtd') ? document.getElementById('jenisTtd').value : 'barcode';
-                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
+                let statusLaporan = document.querySelector('select[name="status_laporan"]') ? document.querySelector('select[name="status_laporan"]').value : 'semua';
+                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat + "&status_laporan=" + statusLaporan +
                     "&format=" + tipe + "&jenis_ttd=" + jenisTtd;
                 window.location.href = url;
             }
