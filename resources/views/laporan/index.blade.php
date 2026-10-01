@@ -219,7 +219,24 @@
                                     <td class="px-4 py-3">{{ $row->umur ?? '-' }}</td>
                                     <td class="px-4 py-3 font-semibold">{{ $row->berat ?? '-' }} Kg</td>
                                     @if($jenis_laporan == 'hewan_ditolak')
-                                        <td class="px-4 py-3">{{ $row->status }}</td>
+                                        <td class="px-4 py-3">
+                                            @if(str_contains($row->status, 'Ditolak'))
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">{{ $row->status }}</span>
+                                            @elseif($row->antemortem && str_contains($row->antemortem->status_antemortem, 'Ditolak'))
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">Ditolak Antemortem</span>
+                                            @elseif($row->postmortem && (str_contains($row->postmortem->kondisi_karkas, 'Ditolak') || str_contains($row->postmortem->kondisi_jeroan, 'Ditolak')))
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">Ditolak Postmortem</span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">{{ $row->status }}</span>
+                                            @endif
+
+                                            @if($row->antemortem && $row->antemortem->tanda_penyakit && $row->antemortem->tanda_penyakit != 'Tidak Ada')
+                                                <div class="text-xs text-slate-500 mt-1 font-medium"><i class="fas fa-notes-medical text-rose-500 mr-1"></i> Penyakit: {{ $row->antemortem->tanda_penyakit }}</div>
+                                            @endif
+                                            @if($row->antemortem && $row->antemortem->catatan && trim(strip_tags($row->antemortem->catatan)) != '')
+                                                <div class="text-xs text-slate-400 mt-0.5">{!! strip_tags($row->antemortem->catatan) !!}</div>
+                                            @endif
+                                        </td>
                                     @endif
 
                                 @elseif($jenis_laporan == 'pembayaran')

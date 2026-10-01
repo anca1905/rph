@@ -27,7 +27,17 @@ class LaporanController extends Controller
                     $dateField = 'tanggal_masuk';
                     break;
                 case 'hewan_ditolak':
-                    $query = Hewan::where('kategori', 'Hewan Harian')->where('status', 'like', '%Ditolak%');
+                    $query = Hewan::with(['antemortem', 'postmortem'])
+                        ->where(function ($q) {
+                            $q->where('status', 'like', '%Ditolak%')
+                              ->orWhereHas('antemortem', function ($qa) {
+                                  $qa->where('status_antemortem', 'like', '%Ditolak%');
+                              })
+                              ->orWhereHas('postmortem', function ($qp) {
+                                  $qp->where('kondisi_karkas', 'like', '%Ditolak%')
+                                     ->orWhere('kondisi_jeroan', 'like', '%Ditolak%');
+                              });
+                        });
                     $dateField = 'tanggal_masuk';
                     break;
                 case 'pengawasan':
@@ -59,16 +69,41 @@ class LaporanController extends Controller
             }
 
             if ($query instanceof \Illuminate\Database\Eloquent\Builder) {
-                if (!empty($start_date) && !empty($end_date)) {
-                    $query->whereBetween($dateField, [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
-                } elseif (!empty($start_date)) {
-                    $query->where($dateField, '>=', $start_date . ' 00:00:00');
-                } elseif (!empty($end_date)) {
-                    $query->where($dateField, '<=', $end_date . ' 23:59:59');
+                if ($jenis_laporan == 'hewan_ditolak') {
+                    if (!empty($start_date) && !empty($end_date)) {
+                        $query->where(function ($q) use ($start_date, $end_date) {
+                            $q->whereBetween('tanggal_masuk', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+                              ->orWhereHas('antemortem', function ($qa) use ($start_date, $end_date) {
+                                  $qa->whereBetween('tanggal_periksa', [$start_date, $end_date]);
+                              });
+                        });
+                    } elseif (!empty($start_date)) {
+                        $query->where(function ($q) use ($start_date) {
+                            $q->where('tanggal_masuk', '>=', $start_date . ' 00:00:00')
+                              ->orWhereHas('antemortem', function ($qa) use ($start_date) {
+                                  $qa->where('tanggal_periksa', '>=', $start_date);
+                              });
+                        });
+                    } elseif (!empty($end_date)) {
+                        $query->where(function ($q) use ($end_date) {
+                            $q->where('tanggal_masuk', '<=', $end_date . ' 23:59:59')
+                              ->orWhereHas('antemortem', function ($qa) use ($end_date) {
+                                  $qa->where('tanggal_periksa', '<=', $end_date);
+                              });
+                        });
+                    }
+                    $dataLaporan = $query->latest('tanggal_masuk')->get();
+                } else {
+                    if (!empty($start_date) && !empty($end_date)) {
+                        $query->whereBetween($dateField, [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+                    } elseif (!empty($start_date)) {
+                        $query->where($dateField, '>=', $start_date . ' 00:00:00');
+                    } elseif (!empty($end_date)) {
+                        $query->where($dateField, '<=', $end_date . ' 23:59:59');
+                    }
+                    
+                    $dataLaporan = $query->latest($dateField)->get();
                 }
-                
-                
-                $dataLaporan = $query->latest($dateField)->get();
             }
         }
 

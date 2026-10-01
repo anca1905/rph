@@ -36,8 +36,17 @@ class DashboardController extends Controller
         // 1. KARTU: Total Hewan Masuk (Seluruh data registrasi hewan)
         $totalHewan = Hewan::count();
 
-        // 2. KARTU: Data Hewan Ditolak (Mencari status yang mengandung kata 'Ditolak')
-        $hewanDitolak = Hewan::where('status', 'like', '%Ditolak%')->count();
+        // 2. KARTU: Data Hewan Ditolak (Mencari status yang mengandung kata 'Ditolak' atau pemeriksaan yang ditolak)
+        $hewanDitolak = Hewan::where(function ($q) {
+            $q->where('status', 'like', '%Ditolak%')
+              ->orWhereHas('antemortem', function ($qa) {
+                  $qa->where('status_antemortem', 'like', '%Ditolak%');
+              })
+              ->orWhereHas('postmortem', function ($qp) {
+                  $qp->where('kondisi_karkas', 'like', '%Ditolak%')
+                     ->orWhere('kondisi_jeroan', 'like', '%Ditolak%');
+              });
+        })->count();
 
         // 3. KARTU: Data Pemotongan Harian (Hari ini saja)
         $pemotonganHarian = Pemotongan::whereDate('waktu_potong', $now->today())->count();

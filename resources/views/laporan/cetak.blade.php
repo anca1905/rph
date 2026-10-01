@@ -432,7 +432,25 @@
                                 <td>{{ $row->umur ?? '-' }}</td>
                                 <td>{{ $row->berat ?? '-' }} Kg</td>
                                 @if($jenis_laporan == 'hewan_ditolak')
-                                    <td class="text-left" style="font-size: 8pt;">{{ $row->status }}</td>
+                                    <td class="text-left" style="font-size: 8pt;">
+                                        <strong>
+                                            @if(str_contains($row->status, 'Ditolak'))
+                                                {{ $row->status }}
+                                            @elseif($row->antemortem && str_contains($row->antemortem->status_antemortem, 'Ditolak'))
+                                                Ditolak Antemortem
+                                            @elseif($row->postmortem && (str_contains($row->postmortem->kondisi_karkas, 'Ditolak') || str_contains($row->postmortem->kondisi_jeroan, 'Ditolak')))
+                                                Ditolak Postmortem
+                                            @else
+                                                {{ $row->status }}
+                                            @endif
+                                        </strong>
+                                        @if($row->antemortem && $row->antemortem->tanda_penyakit && $row->antemortem->tanda_penyakit != 'Tidak Ada')
+                                            <br><span>Penyakit: {{ $row->antemortem->tanda_penyakit }}</span>
+                                        @endif
+                                        @if($row->antemortem && $row->antemortem->catatan && trim(strip_tags($row->antemortem->catatan)) != '')
+                                            <br><span>Catatan: {{ trim(strip_tags($row->antemortem->catatan)) }}</span>
+                                        @endif
+                                    </td>
                                 @endif
                             @elseif($jenis_laporan == 'idul_adha')
                                 <td>{{ \Carbon\Carbon::parse($row->tanggal)->format('d/m/Y') }}</td>
