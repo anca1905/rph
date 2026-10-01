@@ -19,7 +19,7 @@
             Laporan</h3>
 
         <form action="{{ route('laporan.index') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-2">Tanggal Mulai</label>
@@ -55,16 +55,6 @@
                         <option value="postmortem"
                             {{ isset($jenis_laporan) && $jenis_laporan == 'postmortem' ? 'selected' : '' }}>Data
                             Pemeriksaan Postmortem</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-2">Status Laporan</label>
-                    <select name="status_laporan"
-                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 font-medium text-sm rounded-xl focus:outline-none focus:border-green-500 transition-colors shadow-inner">
-                        <option value="semua" {{ (isset($status_laporan) && $status_laporan == 'semua') || empty($status_laporan) ? 'selected' : '' }}>Semua Status</option>
-                        <option value="disetujui" {{ isset($status_laporan) && $status_laporan == 'disetujui' ? 'selected' : '' }}>Hanya Disetujui / Lolos</option>
-                        <option value="ditolak" {{ isset($status_laporan) && $status_laporan == 'ditolak' ? 'selected' : '' }}>Hanya Ditolak</option>
                     </select>
                 </div>
 
@@ -485,8 +475,7 @@
                 }
 
                 let jenisTtd = document.getElementById('jenisTtd') ? document.getElementById('jenisTtd').value : 'barcode';
-                let statusLaporan = document.querySelector('select[name="status_laporan"]') ? document.querySelector('select[name="status_laporan"]').value : 'semua';
-                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat + "&status_laporan=" + statusLaporan +
+                let url = "{{ route('laporan.export') }}?jenis_laporan=" + jns + "&start_date=" + startDate + "&end_date=" + endDate + "&kategori=" + kat +
                     "&format=" + tipe + "&jenis_ttd=" + jenisTtd;
                 window.location.href = url;
             }
