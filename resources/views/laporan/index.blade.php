@@ -176,9 +176,6 @@
                                 <th class="px-4 py-4 border-b border-slate-100">Kategori</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Umur</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Berat</th>
-                                @if($jenis_laporan == 'hewan_ditolak')
-                                    <th class="px-4 py-4 border-b border-slate-100">Keterangan</th>
-                                @endif
 
                                 <th class="px-4 py-4 border-b border-slate-100">Tgl Periksa</th>
                                 <th class="px-4 py-4 border-b border-slate-100">Status AM</th>

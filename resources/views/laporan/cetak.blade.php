@@ -386,9 +386,6 @@
                         <th>Kategori</th>
                         <th>Umur</th>
                         <th>Berat</th>
-                        @if($jenis_laporan == 'hewan_ditolak')
-                            <th>Keterangan</th>
-                        @endif
                         <th>Tgl Periksa</th>
                         <th>Kondisi Fisik</th>
                         <th>Tanda Penyakit</th>
